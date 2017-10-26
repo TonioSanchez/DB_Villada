@@ -1,0 +1,339 @@
+                                                        REDIS TUTORIAL 
+                                                        ===== ========
+                                                        
+ 
+1] redis-server
+
+2] docker run -it --link redis:redis --rm redis redis-cli -h redis -p 6379
+   PING
+   CONFIG GET *
+
+3] redis:6379> SET field 'Hola'
+   OK
+   redis:6379> GET field 
+   "Hola"
+   
+   redis:6379> APPEND field 'world'
+   (integer) 28
+   redis:6379> GET field
+   "Hola world"
+
+
+4] 
+  redis:6379> HMSET class name 'Clase' description 'Base de datos' students 19
+  redis:6379> HGETALL class
+  1) "name"
+  2) "Clase"
+  3) "description"
+  4) "Base de datos"
+  5) "students"
+  6) "19"
+
+  redis:6379> HGET class name
+  "Clase"
+  
+
+5] redis:6379> LPUSH base 'field1' 'field2' 'field3' 'field4'
+  (integer) 4
+  redis:6379> LRANGE base 0 -1
+  1) "field4"
+  2) "field3"
+  3) "field2"
+  4) "field1"
+
+  redis:6379> LINDEX base 1
+  "field3"
+   
+6] redis:6379> SADD veterinaria 'perro' 'gato' 'pez' 'conejo' 'loro'
+   (integer) 5 
+   
+   redis:6379> SMEMBERS veterinaria
+   1) "perro"
+   2) "gato"
+   3) "pez"
+   4) "conejo"
+   5) "loro"
+   
+   redis:6379> SPOP veterinaria "perro"
+   
+   redis:6379> SMEMBERS veterinaria
+   1) "gato"
+   2) "pez"
+   3) "conejo"
+   4) "loro
+   
+
+7] 
+  redis:6379> ZADD carrera 1 'Mariano' 2 'Roberto' 3 'Marcelo' 4 'Diego' 5 'Huevo'
+  (integer) 5
+  
+  redis:6379> ZRANK carrera 'Huevo'
+  (integer) 4
+
+  redis:6379> ZREM carrera 'Huevo'
+  (integer) 1
+  
+8]   
+  redis:6379> PUBLISH important-message 'La segunda cosa más cortante en el mundo es el bisturí'
+  (integer) 1
+  redis:6379> PUBLISH important-message 'La primera sos vos'
+  (integer) 1
+
+  redis:6379> SUBSCRIBE important-message
+  Reading messages... (press Ctrl-C to quit)
+  1) "subscribe"
+  2) "important-stuff"
+  3) (integer) 1
+  1) "message"
+  2) "important-message"
+  3) "La segunda cosa más cortante en el mundo es el bisturí"
+  1) "message"
+  2) "important-message"
+  3) "La primera sos vos"
+  
+9]
+  redis:6379> MULTI (pone los comandos en fila)
+  OK
+  redis:6379> SET action 'clap!'
+  QUEUED
+  redis:6379> GET action
+  QUEUED
+  redis:6379> EXEC (los ejecuta)
+  1) OK
+  2) "clap!"
+  
+10]
+Redis SAVE command is used to create a backup of the current Redis database.
+
+This command will create a dump.rdb file in your Redis directory.
+
+redis:6379> SAVE
+OK
+To restore Redis data, move Redis backup file (dump.rdb) into your Redis directory and start the server. To get your Redis directory, use CONFIG command of Redis as shown below.
+
+redis:6379> CONFIG get dir
+1) "dir"
+2) "/data"
+In the output of the above command /data is the directory, where Redis server is installed.
+
+
+
+11]
+------Se puede hacer un benchmark que podes descargar con redis-tools: 
+     
+     $ sudo apt-get install redis-tools
+      
+      
+------Luego podes pedirle un ouput donde vos podes, pasarle el nuemro de veces que ejecutaste los comandos y el numeros de 
+veces que te devuelva en un csv:
+
+docker run -it --link redis-cont:redis --rm redis redis-benchmark -n 100000 -h redis -p 6379 	
+
+
+MY OUTPUT:
+
+====== PING_INLINE ======
+  100000 requests completed in 0.80 seconds
+  50 parallel clients
+  3 bytes payload
+  keep alive: 1
+
+99.99% <= 1 milliseconds
+100.00% <= 1 milliseconds
+124688.28 requests per second
+
+====== PING_BULK ======
+  100000 requests completed in 0.80 seconds
+  50 parallel clients
+  3 bytes payload
+  keep alive: 1
+
+99.96% <= 1 milliseconds
+100.00% <= 1 milliseconds
+125786.16 requests per second
+
+====== SET ======
+  100000 requests completed in 0.77 seconds
+  50 parallel clients
+  3 bytes payload
+  keep alive: 1
+
+99.95% <= 1 milliseconds
+100.00% <= 2 milliseconds
+100.00% <= 2 milliseconds
+129032.27 requests per second
+
+====== GET ======
+  100000 requests completed in 0.80 seconds
+  50 parallel clients
+  3 bytes payload
+  keep alive: 1
+
+100.00% <= 0 milliseconds
+124378.11 requests per second
+
+====== INCR ======
+  100000 requests completed in 0.84 seconds
+  50 parallel clients
+  3 bytes payload
+  keep alive: 1
+
+99.94% <= 1 milliseconds
+99.95% <= 2 milliseconds
+100.00% <= 2 milliseconds
+119617.22 requests per second
+
+====== LPUSH ======
+  100000 requests completed in 0.77 seconds
+  50 parallel clients
+  3 bytes payload
+  keep alive: 1
+
+99.99% <= 1 milliseconds
+100.00% <= 1 milliseconds
+129701.68 requests per second
+
+====== RPUSH ======
+  100000 requests completed in 0.76 seconds
+  50 parallel clients
+  3 bytes payload
+  keep alive: 1
+
+100.00% <= 0 milliseconds
+130718.95 requests per second
+
+====== LPOP ======
+  100000 requests completed in 0.77 seconds
+  50 parallel clients
+  3 bytes payload
+  keep alive: 1
+
+100.00% <= 0 milliseconds
+129870.13 requests per second
+
+====== RPOP ======
+  100000 requests completed in 0.80 seconds
+  50 parallel clients
+  3 bytes payload
+  keep alive: 1
+
+100.00% <= 0 milliseconds
+125000.00 requests per second
+
+====== SADD ======
+  100000 requests completed in 0.77 seconds
+  50 parallel clients
+  3 bytes payload
+  keep alive: 1
+
+100.00% <= 0 milliseconds
+130208.34 requests per second
+
+====== HSET ======
+  100000 requests completed in 0.78 seconds
+  50 parallel clients
+  3 bytes payload
+  keep alive: 1
+
+100.00% <= 0 milliseconds
+128369.71 requests per second
+
+====== SPOP ======
+  100000 requests completed in 0.78 seconds
+  50 parallel clients
+  3 bytes payload
+  keep alive: 1
+
+100.00% <= 0 milliseconds
+127877.23 requests per second
+
+====== LPUSH (needed to benchmark LRANGE) ======
+  100000 requests completed in 0.76 seconds
+  50 parallel clients
+  3 bytes payload
+  keep alive: 1
+
+100.00% <= 0 milliseconds
+132275.14 requests per second
+
+====== LRANGE_100 (first 100 elements) ======
+  100000 requests completed in 1.42 seconds
+  50 parallel clients
+  3 bytes payload
+  keep alive: 1
+
+99.98% <= 1 milliseconds
+100.00% <= 1 milliseconds
+70274.07 requests per second
+
+====== LRANGE_300 (first 300 elements) ======
+  100000 requests completed in 3.61 seconds
+  50 parallel clients
+  3 bytes payload
+  keep alive: 1
+
+89.94% <= 1 milliseconds
+99.99% <= 2 milliseconds
+100.00% <= 2 milliseconds
+27708.51 requests per second
+
+====== LRANGE_500 (first 450 elements) ======
+  100000 requests completed in 4.71 seconds
+  50 parallel clients
+  3 bytes payload
+  keep alive: 1
+
+1.59% <= 1 milliseconds
+99.95% <= 2 milliseconds
+99.99% <= 3 milliseconds
+100.00% <= 3 milliseconds
+21217.91 requests per second
+
+====== LRANGE_600 (first 600 elements) ======
+  100000 requests completed in 5.96 seconds
+  50 parallel clients
+  3 bytes payload
+  keep alive: 1
+
+0.03% <= 1 milliseconds
+94.79% <= 2 milliseconds
+99.81% <= 3 milliseconds
+99.94% <= 4 milliseconds
+99.98% <= 5 milliseconds
+99.99% <= 6 milliseconds
+100.00% <= 7 milliseconds
+100.00% <= 7 milliseconds
+16778.52 requests per second
+
+====== MSET (10 keys) ======
+  100000 requests completed in 0.75 seconds
+  50 parallel clients
+  3 bytes payload
+  keep alive: 1
+
+99.97% <= 1 milliseconds
+100.00% <= 1 milliseconds
+133155.80 requests per second
+
+12]
+
+-----Instalas undriver para python:    
+
+  $ sudo pip install redis
+  
+-----Algunas operaciones:  
+
+  import redis
+
+  r = redis.Redis(
+    host='hostname',
+    port=port, 
+    password='password')
+
+
+  r.set('foo', 'bar')
+  value = r.get('foo')
+  print(value)
+
+  # Output: bar
+
